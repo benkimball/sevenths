@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=640">
+    <title>Sevenths</title>
+    <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <style type="text/css" media="screen">
+      body, div { margin: 0; padding: 0; }
+      .box {
+        width: 640px;
+        height: 640px;
+        position: fixed;
+        z-index: -1;
+        border-right: 1px solid lime;
+      }
+      .appname {
+        width: 640px;
+        font-family: monospace;
+        color: #999;
+        font-size: 1em;
+        letter-spacing: 0.5em;
+        text-align: center;
+        padding-top: 0.7em;
+      }
+      .chord {
+        width: 640px;
+        text-align: center;
+        font-family: serif;
+        color: #222;
+        font-size: 10em;
+      }
+      polygon {
+        fill: #222;
+        stroke: #fff;
+        stroke-width: 2;
+      }
+      .controls {
+        width: 640px;
+        text-align: center;
+      }
+      @media only screen {
+        .chord { padding-top: 0.5em; }
+        .controls { padding-top: 14em; }
+      }
+      @media only screen and (orientation: landscape) {
+        .chord { padding-top: 0.2em; }
+        .controls { padding-top: 2em; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box"></div>
+    <div class="appname">sevenths</div>
+    <div class="chord">&nbsp;</div>
+    <div class="controls">
+      <svg width="367" height="52">
+        <g class="button" data-speed="pause" transform="translate(0,0)">
+          <rect fill="#222" stroke="none" x="0" width="10" y="5" height="30" />
+          <rect fill="#222" stroke="none" x="15" width="10" y="5" height="30" />
+        </g>
+        <g class="button" data-speed="slow" transform="translate(100,0)">
+          <polygon points="0 0 0 40 32 20"/>
+        </g>
+        <g class="button" data-speed="medium" transform="translate(200,0)">
+          <polygon points="15 0 15 40 47 20"/>
+          <polygon points="0 0 0 40 32 20"/>
+        </g>
+        <g class="button" data-speed="fast" transform="translate(305,0)">
+          <polygon points="30 0 30 40 62 20"/>
+          <polygon points="15 0 15 40 47 20"/>
+          <polygon points="0 0 0 40 32 20"/>
+        </g>
+      </svg>
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+      var cv = [Math.floor(Math.random()*12), Math.floor(Math.random()*5)];
+      var intid = null, delay = 0;
+      
+      function next_chord(cv) {
+        var r = Math.floor(Math.random()*4)-1; if(r>=0) r += 1;
+        return [(cv[0]+r+12)%12, Math.floor(Math.random()*5)];
+      }
+      
+      function chord_name(cv) {
+        var a = ["C", "G", "D", "A", "E", "B", "F#", "C#", "Ab", "Eb", "Bb", "F"];
+        var b = ["maj7", "7", "m7", "⌀7", "°7"];
+        return a[cv[0]]+b[cv[1]];
+      }
+      
+      function update() {
+        cv = next_chord(cv);
+        $('.chord').text(chord_name(cv));
+      }
+      
+      $('.chord').text(chord_name(cv));
+
+      $('g.button')
+        .on('click', function(e) {
+          if(intid !== null) {
+            window.clearInterval(intid);
+            intid = null;
+          }
+          $('.button *').css('fill', '#222');
+          $('*', $(this)).css('fill', 'steelblue');
+          var delays = {'pause': 0, 'slow': 7000, 'medium': 4000, 'fast': 1000};
+          var delay = delays[$(this).data('speed')];
+          if(delay > 0) {
+            update();
+            intid = window.setInterval(update, delay);
+          }
+        });
+    </script>
+  </body>
+</html>
